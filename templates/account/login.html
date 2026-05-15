@@ -1,86 +1,70 @@
+{% extends "base_auth.html" %}
 {% load socialaccount %}
-<!DOCTYPE html>
 
-<html lang="pt-br">
+{% block title %}Login{% endblock %}
+{% block subtitle %}Log in to{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
+{% block content %}
+    <a href="{% provider_login_url 'google' %}" 
+        class="w-full flex items-center justify-center gap-3 bg-black text-white py-3 rounded-xl font-bold transition-all duration-300 hover:bg-gray-900 hover:shadow-xl active:scale-95">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" class="brightness-110">    
+        <span class="tracking-wide">Login with Google</span>
+    </a>
 
-<body class="bg-slate-50 h-screen flex items-center justify-center">
-
-    <div class="w-full max-w-md p-4">
-        <div class="text-center mb-8">
-            <p class="text-gray-500 mt-2">Log in to</p>
-            <h1 class="text-3xl font-bold">chatbot <span class="text-blue-600">AI</span></h1>
+    <div class="relative my-8">
+        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+            <div class="w-full border-t border-gray-200"></div>
         </div>
-
-        <a href="{% provider_login_url 'google' %}" 
-            class="w-full flex items-center justify-center gap-3 bg-black text-white py-3 rounded-xl font-bold transition-all duration-300 hover:bg-gray-900 hover:shadow-xl active:scale-95">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" class="brightness-110">    
-            <span class="tracking-wide">Login with Google</span>
-        </a>
-
-        <div class="relative my-8">
-            <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                <div class="w-full border-t border-gray-200"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-                <span class="bg-slate-50 px-3 text-gray-500">or</span>
-            </div>
+        <div class="relative flex justify-center text-sm">
+            <span class="bg-slate-50 px-3 text-gray-500">or</span>
         </div>
-
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-4 mb-8">
-            {% csrf_token %}
-            <div class="relative flex items-center">
-                <div class="absolute left-4 text-gray-400">
-                    <i class="ph ph-envelope text-xl"></i>
-                </div>
-
-                <input type="email" name="login" id="id_login" 
-                    placeholder="Your Email"
-                    class="bg-white w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-transparent outline-none transition shadow-sm">
-                {% if form.login.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.login.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <div class="relative flex items-center">
-                    <div class="absolute left-4 text-gray-400">
-                        <i class="ph ph-lock text-xl"></i>
-                    </div>
-                    <input type="password" name="password" id="id_password" 
-                        placeholder="Your Password"
-                        class="bg-white w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-transparent outline-none transition shadow-sm">
-                </div>
-            </div>
-
-            <button type="submit" class="w-full bg-gray-100 border border-gray-200 shadow-sm text-black py-3 rounded-xl font- hover:bg-gray-200 transition-all active:scale-95">
-                Log in
-            </button>
-        </form>
-
-        <div class="flex justify-center mt-6">
-            <a href="{% url 'account_reset_password' %}" 
-               class="text-sm text-black font-semibold hover:opacity-80 transition-opacity">
-               Forgot password?
-            </a>
-        </div>
-
-        <div class="flex items-center justify-center gap-2 mt-4">
-            <p class="text-gray-500 text-sm">Don't have an account?</p>
-            <a href="{% url 'account_signup' %}" 
-            class="text-sm text-black font-semibold hover:opacity-80 transition-opacity">
-            Sign up
-            </a>
-        </div>
-
     </div>
 
-</body>
+    <form method="POST" action="{% url 'account_login' %}" class="space-y-4 mb-8">
+        {% csrf_token %}
+        
+        <div class="relative flex items-center">
+            <div class="absolute left-4 text-gray-400">
+                <i class="ph ph-envelope text-xl"></i>
+            </div>
 
-</html>
+            <input type="email" name="login" id="id_login" 
+                placeholder="Your Email"
+                class="bg-white w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-transparent outline-none transition shadow-sm">
+            {% if form.login.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.login.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <div class="relative flex items-center">
+                <div class="absolute left-4 text-gray-400">
+                    <i class="ph ph-lock text-xl"></i>
+                </div>
+                <input type="password" name="password" id="id_password" 
+                    placeholder="Your Password"
+                    class="bg-white w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-transparent outline-none transition shadow-sm">
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gray-100 border border-gray-200 shadow-sm text-black py-3 rounded-xl font- hover:bg-gray-200 transition-all active:scale-95">
+            Log in
+        </button>
+    </form>
+
+    <div class="flex justify-center mt-6">
+        <a href="{% url 'account_reset_password' %}" 
+            class="text-sm text-black font-semibold hover:opacity-80 transition-opacity">
+            Forgot password?
+        </a>
+    </div>
+
+    <div class="flex items-center justify-center gap-2 mt-4">
+        <p class="text-gray-500 text-sm">Don't have an account?</p>
+        <a href="{% url 'account_signup' %}" 
+        class="text-sm text-black font-semibold hover:opacity-80 transition-opacity">
+        Sign up
+        </a>
+    </div>
+
+{% endblock %}
