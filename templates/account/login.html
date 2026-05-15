@@ -12,7 +12,7 @@
 
 <body class="bg-slate-50 h-screen flex items-center justify-center">
 
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-md p-4">
         <div class="text-center mb-8">
             <p class="text-gray-500 mt-2">Log in to</p>
             <h1 class="text-3xl font-bold">chatbot <span class="text-blue-600">AI</span></h1>
@@ -26,9 +26,8 @@
 
         <div class="relative my-8">
             <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                <div class="w-full border-t border-gray-300"></div>
+                <div class="w-full border-t border-gray-200"></div>
             </div>
-            
             <div class="relative flex justify-center text-sm">
                 <span class="bg-slate-50 px-3 text-gray-500">or</span>
             </div>
@@ -43,7 +42,7 @@
 
                 <input type="email" name="login" id="id_login" 
                     placeholder="Your Email"
-                    class="bg-gray-100 w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-400 focus:border-transparent outline-none transition shadow-sm">
+                    class="bg-white w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-transparent outline-none transition shadow-sm">
                 {% if form.login.errors %}
                     <p class="text-red-500 text-xs mt-1">{{ form.login.errors.0 }}</p>
                 {% endif %}
@@ -56,11 +55,11 @@
                     </div>
                     <input type="password" name="password" id="id_password" 
                         placeholder="Your Password"
-                        class="bg-gray-100 w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-400 focus:border-transparent outline-none transition shadow-sm">
+                        class="bg-white w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:border-transparent outline-none transition shadow-sm">
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-gray-200 border border-gray-300 shadow-sm text-black py-3 rounded-xl font- hover:bg-gray-300 transition-all active:scale-95">
+            <button type="submit" class="w-full bg-gray-100 border border-gray-200 shadow-sm text-black py-3 rounded-xl font- hover:bg-gray-200 transition-all active:scale-95">
                 Log in
             </button>
         </form>
