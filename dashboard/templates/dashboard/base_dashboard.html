@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} | chatbot AI</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="font-sans text-gray-900 antialiased bg-slate-50">
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="w-64 bg-transparent justify-between flex flex-col transition-all duration-300 ease-in-out">
+            <div>
+                <div class="p-3 border-b border-gray-200 flex items-center justify-between min-h-[61px] gap-2">
+                    <div class="flex items-center gap-3 overflow-hidden sidebar-text transition-opacity duration-200">
+                        <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700 capitalize shrink-0">
+                            {{ user.email|slice:":2" }}
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-xs font-semibold text-gray-900 truncate">{{ user.email }}</span>
+                            <span class="text-[10px] text-gray-400">Online</span>
+                        </div>
+                    </div>
+
+                    <button id="toggle-sidebar" class="flex items-center justify-center h-9 w-9 text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all cursor-pointer shrink-0" title="Recolher menu">
+                        <i id="toggle-icon" class="ph ph-sidebar text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="p-3">
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-xl transition-all justify-center lg:justify-start">
+                        <i class="ph ph-note-pencil text-xl shrink-0"></i>
+                        <span class="sidebar-text">New Chat</span>
+                    </a>
+                </div>
+
+                <div class="px-3 py-3 sidebar-text transition-opacity duration-200">
+                    <nav class="space-y-1">
+                        <p class="px-4 font-bold text-xs text-gray-900 uppercase tracking-wider mb-2">Chats</p>
+                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-semibold bg-gray-200 text-black rounded-xl transition-all">
+                            <span>Chat 1</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all">
+                            <span>Chat 2</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all">
+                            <span>Chat 3</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-gray-200 flex flex-col gap-1">
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all">
+                    <i class="ph ph-gear-six text-xl shrink-0"></i>
+                    <span class="sidebar-text">Settings</span>
+                </a>
+                <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all">
+                    <i class="ph ph-sign-out text-xl shrink-0"></i>
+                    <span class="sidebar-text">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-y-auto bg-white my-3 mr-3 border border-gray-200 rounded-xl shadow-xl shadow-center transition-all duration-300">
+            <div class="p-8 w-full min-h-full">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+
+        toggleBtn.addEventListener('click', () => {
+            const isExpanded = sidebar.classList.contains('w-64');
+
+            if (isExpanded) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                
+                sidebarTexts.forEach(text => text.classList.add('hidden'));
+                
+                toggleBtn.classList.remove('w-9');
+                toggleBtn.classList.add('flex-1', 'w-full');
+            } else {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                
+                sidebarTexts.forEach(text => text.classList.remove('hidden'));
+                
+                toggleBtn.classList.remove('flex-1', 'w-full');
+                toggleBtn.classList.add('w-9');
+            }
+        });
+    </script>
+</body>
+</html>

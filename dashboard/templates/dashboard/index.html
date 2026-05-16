@@ -1,0 +1,97 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}New Chat{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] max-w-3xl mx-auto w-full">
+    <div class="text-center mb-8">
+        <h2 class="text-4xl font-extrabold tracking-tight text-gray-900 mb-2">
+            How can I help you today?
+        </h2>
+        <p class="text-gray-500 text-sm">
+            Academic Chatbot with RAG and Local Models (Ollama)
+        </p>
+    </div>
+
+    <form method="POST" action="#" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-4 shadow-xs focus-within:ring-2 focus-within:ring-gray-500/20 focus-within:border-gray-500 transition-all">
+        {% csrf_token %}
+        <div class="w-full mb-4">
+            <textarea 
+                name="prompt" 
+                rows="3" 
+                placeholder="Ask something about the documents in the context..." 
+                class="w-full bg-transparent border-0 text-gray-900 placeholder-gray-400 focus:ring-0 outline-none resize-none text-base antialiased"
+                required
+            ></textarea>
+        </div>
+
+        <div class="border-t border-gray-200/60 my-3"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="relative inline-block text-left">
+                    <select name="rag_context" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:text-black hover:border-gray-300 transition-all outline-none appearance-none cursor-pointer pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_auto] bg-[right_10px_center] bg-no-repeat">
+                        <option value="all">📚 All Documents</option>
+                        <option value="manuals">📄 Technical Manuals</option>
+                        <option value="policies">📜 Guidelines & Policies</option>
+                        <option value="none">🌐 No RAG (Just LLM)</option>
+                    </select>
+                </div>
+
+                <button type="button" id="btn-params" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:text-black hover:bg-gray-300 hover:border-gray-300 transition-all cursor-pointer">
+                    <i class="ph ph-sliders text-sm"></i>
+                    AI parameters
+                </button>
+            </div>
+
+            <div>
+                <button type="submit" class="flex items-center justify-center h-9 w-9 bg-gray-900 hover:bg-black text-white rounded-xl transition-all shadow-xs cursor-pointer" title="Send message">
+                    <i class="ph ph-arrow-up text-lg font-bold"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="panel-params" class="hidden mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+            <div class="flex flex-col gap-1.5">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                        Temperature (Criativity)
+                    </label>
+                    <span id="val-temperature" class="text-xs font-mono bg-gray-200 px-1.5 py-0.5 rounded text-gray-600">0.7</span>
+                </div>
+                <input type="range" name="temperature" min="0.0" max="1.0" step="0.1" value="0.7" id="input-temperature" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-900">
+                <span class="text-[10px] text-gray-400">Low values are more accurate; high values are more creative.</span>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold text-gray-700">
+                        Top-K (RAG chunk)
+                    </label>
+                    <span id="val-topk" class="text-xs font-mono bg-gray-200 px-1.5 py-0.5 rounded text-gray-600">4</span>
+                </div>
+                <input type="range" name="top_k" min="1" max="10" step="1" value="4" id="input-topk" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-900">
+                <span class="text-[10px] text-gray-400">Number of text chunks injected into the Ollama prompt.</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    const btnParams = document.getElementById('btn-params');
+    const panelParams = document.getElementById('panel-params');
+    
+    const inputTemp = document.getElementById('input-temperature');
+    const valTemp = document.getElementById('val-temperature');
+    const inputTopK = document.getElementById('input-topk');
+    const valTopK = document.getElementById('val-topk');
+
+    btnParams.addEventListener('click', () => {
+        panelParams.classList.toggle('hidden');
+        btnParams.classList.toggle('bg-gray-200');
+    });
+
+    inputTemp.addEventListener('input', (e) => valTemp.textContent = e.target.value);
+    inputTopK.addEventListener('input', (e) => valTopK.textContent = e.target.value);
+</script>
+{% endblock %}
