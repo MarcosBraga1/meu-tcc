@@ -1,6 +1,8 @@
-import requests
-from django.shortcuts import render, redirect, get_object_or_404
+import requests, json
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST   
 from .models import ChatConversation, ChatMessage
 
 OLLAMA_API_URL = "http://localhost:11434/api/chat"
@@ -94,3 +96,32 @@ def chat_detail(request, chat_id):
         'user_chats': user_chats,
         'current_model': current_model
     })
+    
+@login_required
+@require_POST
+def rename_chat(request, chat_id):
+    chat = get_object_or_404(ChatConversation, id=chat_id, user=request.user)
+    
+    try:
+        data = json.loads(request.body)
+        new_title = data.get('title', '').strip()
+        
+        if new_title:
+            chat.title = new_title
+            chat.save()
+            return JsonResponse({'success': True, 'new_title': chat.title})
+        
+        return JsonResponse({'success': False, 'error': 'Invalid name'}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid payload'}, status=400)
+
+
+@login_required
+@require_POST
+def delete_chat(request, chat_id):
+    chat = get_object_or_404(ChatConversation, id=chat_id, user=request.user)
+    chat.delete()
+    
+    redirect_url = reverse('dashboard_home') 
+    
+    return JsonResponse({'success': True, 'redirect_url': redirect_url})
