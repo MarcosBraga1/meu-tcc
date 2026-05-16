@@ -1,0 +1,55 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}{{ chat.title }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-[calc(100vh-6rem)] max-w-3xl mx-auto w-full justify-between">
+    <div class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 flex flex-col" id="chat-box">
+        {% for msg in messages %}
+            <div class="w-full flex flex-col {% if msg.role == 'user' %}items-end{% else %}items-start{% endif %}">
+                
+                <span class="text-[10px] text-gray-400 mb-1 px-1 font-semibold uppercase tracking-wider">
+                    {% if msg.role == 'user' %}You{% else %}AI Assistant{% endif %}
+                </span>
+
+                <div class="max-w-[85%] text-left rounded-xl px-4 py-2 text-sm shadow-xs antialiased whitespace-pre-wrap {% if msg.role == 'user' %}bg-gray-900 text-white rounded-br-none{% else %}bg-slate-100 text-gray-800 border border-gray-200/60 rounded-bl-none{% endif %}">{{ msg.content }}</div>
+
+                {% if msg.role == 'assistant' and msg.model_used %}
+                    <span class="text-[9px] text-gray-400 mt-1 px-1 font-mono">
+                        model: {{ msg.model_used }}
+                    </span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST" action="{% url 'chat_detail' chat.id %}" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-4 shadow-xs focus-within:ring-2 focus-within:ring-gray-500/20 focus-within:border-gray-500 transition-all">
+        {% csrf_token %}
+        <div class="w-full mb-2">
+            <textarea name="prompt" rows="2" placeholder="Enter your message..." class="w-full bg-transparent border-0 text-gray-900 placeholder-gray-400 focus:ring-0 outline-none resize-none text-base" required></textarea>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-2">
+                <input type="hidden" name="temperature" value="0.7">
+                
+                <select name="model_name" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:text-black hover:border-gray-300 transition-all outline-none appearance-none cursor-pointer pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_auto] bg-[right_10px_center] bg-no-repeat">
+                    <option value="qwen2.5:3b" {% if current_model == 'qwen2.5:3b' %}selected{% endif %}>Qwen 2.5 (3B)</option>
+                    <option value="llama3" {% if current_model == 'llama3' %}selected{% endif %}>Llama 3 (8B)</option>
+                    <option value="llama3.2" {% if current_model == 'llama3.2' %}selected{% endif %}>Llama 3.2 (3B)</option>
+                    <option value="phi3" {% if current_model == 'phi3' %}selected{% endif %}>Phi 3 (3.8B)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="flex items-center justify-center h-9 w-9 bg-gray-900 hover:bg-black text-white rounded-xl transition-all shadow-xs cursor-pointer">
+                <i class="ph ph-arrow-up text-lg font-bold"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}

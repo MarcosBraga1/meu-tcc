@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="p-3">
-                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-xl transition-all justify-center lg:justify-start">
+                    <a href="{% url 'dashboard_home' %}" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-xl transition-all justify-center lg:justify-start">
                         <i class="ph ph-note-pencil text-xl shrink-0"></i>
                         <span class="sidebar-text">New Chat</span>
                     </a>
@@ -38,15 +38,14 @@
                 <div class="px-3 py-3 sidebar-text transition-opacity duration-200">
                     <nav class="space-y-1">
                         <p class="px-4 font-bold text-xs text-gray-900 uppercase tracking-wider mb-2">Chats</p>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-semibold bg-gray-200 text-black rounded-xl transition-all">
-                            <span>Chat 1</span>
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all">
-                            <span>Chat 2</span>
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-200 rounded-xl transition-all">
-                            <span>Chat 3</span>
-                        </a>
+
+                        {% for c in user_chats %}
+                            <a href="{% url 'chat_detail' c.id %}" class="flex items-center gap-3 px-4 py-2 text-sm rounded-xl transition-all {% if chat.id == c.id %}bg-gray-200 text-black font-semibold{% else %}text-gray-500 hover:text-black hover:bg-gray-200 font-medium{% endif %}">
+                                <span class="truncate">{{ c.title }}</span>
+                            </a>
+                        {% empty %}
+                            <p class="text-xs text-gray-400 px-4 italic">No conversations yet</p>
+                        {% endfor %}
                     </nav>
                 </div>
             </div>
