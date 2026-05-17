@@ -126,10 +126,6 @@
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
 
-            if (!hasContent) {
-                textTarget.innerText = "The model returned no response. Please check if it is installed in Ollama (ollama run <model>).";
-            }
-
         } catch (error) {
             console.error("Stream Error:", error);
             textTarget.innerText = "Connection error with local server.";
