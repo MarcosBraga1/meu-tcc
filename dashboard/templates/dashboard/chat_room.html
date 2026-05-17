@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="flex flex-col h-[calc(100vh-6rem)] max-w-3xl mx-auto w-full justify-between">
-    <div class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 flex flex-col" id="chat-box">
+    <div class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 flex flex-col" id="messages-container">
         {% for msg in messages %}
             <div class="w-full flex flex-col {% if msg.role == 'user' %}items-end{% else %}items-start{% endif %}">
                 
@@ -12,7 +12,7 @@
                     {% if msg.role == 'user' %}You{% else %}AI Assistant{% endif %}
                 </span>
 
-                <div class="max-w-[85%] text-left rounded-xl px-4 py-2 text-sm shadow-xs antialiased whitespace-pre-wrap {% if msg.role == 'user' %}bg-gray-900 text-white rounded-br-none{% else %}bg-slate-100 text-gray-800 border border-gray-200/60 rounded-bl-none{% endif %}">{{ msg.content }}</div>
+                <div class="max-w-[85%] text-left rounded-xl px-4 py-2 text-sm shadow-xs antialiased whitespace-pre-wrap break-words overflow-hidden {% if msg.role == 'user' %}bg-gray-900 text-white rounded-br-none{% else %}bg-slate-100 text-gray-800 border border-gray-200/60 rounded-bl-none{% endif %}">{{ msg.content }}</div>
 
                 {% if msg.role == 'assistant' and msg.model_used %}
                     <span class="text-[9px] text-gray-400 mt-1 px-1 font-mono">
@@ -23,17 +23,17 @@
         {% endfor %}
     </div>
 
-    <form method="POST" action="{% url 'chat_detail' chat.id %}" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-4 shadow-xs focus-within:ring-2 focus-within:ring-gray-500/20 focus-within:border-gray-500 transition-all">
+    <form id="chat-form" method="POST" action="{% url 'chat_detail' chat.id %}" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-4 shadow-xs focus-within:ring-2 focus-within:ring-gray-500/20 focus-within:border-gray-500 transition-all">
         {% csrf_token %}
         <div class="w-full mb-2">
-            <textarea name="prompt" rows="2" placeholder="Enter your message..." class="w-full bg-transparent border-0 text-gray-900 placeholder-gray-400 focus:ring-0 outline-none resize-none text-base" required></textarea>
+            <textarea id="chat-input" name="prompt" rows="2" placeholder="Enter your message..." class="w-full bg-transparent border-0 text-gray-900 placeholder-gray-400 focus:ring-0 outline-none resize-none text-base" required></textarea>
         </div>
 
         <div class="flex items-center justify-between gap-3 pt-1">
             <div class="flex items-center gap-2">
-                <input type="hidden" name="temperature" value="0.7">
+                <input type="hidden" id="temperature-input" name="temperature" value="0.7">
                 
-                <select name="model_name" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:text-black hover:border-gray-300 transition-all outline-none appearance-none cursor-pointer pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_auto] bg-[right_10px_center] bg-no-repeat">
+                <select id="model-select" name="model_name" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:text-black hover:border-gray-300 transition-all outline-none appearance-none cursor-pointer pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_auto] bg-[right_10px_center] bg-no-repeat">
                     <option value="qwen2.5:3b" {% if current_model == 'qwen2.5:3b' %}selected{% endif %}>Qwen 2.5 (3B)</option>
                     <option value="llama3" {% if current_model == 'llama3' %}selected{% endif %}>Llama 3 (8B)</option>
                     <option value="llama3.2" {% if current_model == 'llama3.2' %}selected{% endif %}>Llama 3.2 (3B)</option>
@@ -49,7 +49,136 @@
 </div>
 
 <script>
-    const chatBox = document.getElementById('chat-box');
-    chatBox.scrollTop = chatBox.scrollHeight;
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookiesTrim = cookies[i].trim();
+                if (cookiesTrim.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookiesTrim.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    async function startChatStream(promptText, isFirstMsg = false) {
+        if (!promptText) return;
+
+        const modelName = document.getElementById('model-select')?.value || 'qwen2.5:3b';
+        const temperature = parseFloat(document.getElementById('temperature-input')?.value || 0.7);
+
+        const aiMessageDiv = document.createElement('div');
+        aiMessageDiv.className = "w-full flex flex-col items-start"; 
+        aiMessageDiv.innerHTML = `
+            <span class="text-[10px] text-gray-400 mb-1 px-1 font-semibold uppercase tracking-wider">AI Assistant</span>
+            <div class="max-w-[85%] text-left rounded-xl px-4 py-2 text-sm shadow-xs antialiased whitespace-pre-wrap break-words bg-slate-100 text-gray-800 border border-gray-200/60 rounded-bl-none ai-response-text">|</div>
+            <span class="text-[9px] text-gray-400 mt-1 px-1 font-mono">model: ${modelName}</span>
+        `;
+        messagesContainer.appendChild(aiMessageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        const textTarget = aiMessageDiv.querySelector('.ai-response-text');
+
+        try {
+            const chatId = "{{ chat.id }}";
+            const url = "{% url 'chat_stream' 99999 %}".replace('99999', chatId);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    prompt: promptText,
+                    model_name: modelName,
+                    temperature: temperature,
+                    is_first_msg: isFirstMsg
+                })
+            });
+
+            if (!response.ok) {
+                textTarget.innerText = "Error generating server response.";
+                return;
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            textTarget.innerText = ""; 
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                const chunkText = decoder.decode(value, { stream: true });
+                textTarget.innerText += chunkText;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            if (!hasContent) {
+                textTarget.innerText = "The model returned no response. Please check if it is installed in Ollama (ollama run <model>).";
+            }
+
+        } catch (error) {
+            console.error("Stream Error:", error);
+            textTarget.innerText = "Connection error with local server.";
+        }
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = "w-full flex flex-col items-end";
+            userMessageDiv.innerHTML = `
+                <span class="text-[10px] text-gray-400 mb-1 px-1 font-semibold uppercase tracking-wider">You</span>
+                <div class="max-w-[85%] text-left rounded-xl px-4 py-2 text-sm shadow-xs antialiased whitespace-pre-wrap break-words overflow-hidden bg-gray-900 text-white rounded-br-none">${messageText}</div>
+            `;
+            messagesContainer.appendChild(userMessageDiv);
+            
+            chatInput.value = "";
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            startChatStream(messageText, false);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.get('first_msg') === 'true') {
+            const modelName = urlParams.get('model_name') || 'qwen2.5:3b';
+            const temperature = urlParams.get('temperature') || '0.7';
+            const modelSelect = document.getElementById('model-select');
+            if (modelSelect) modelSelect.value = modelName;
+
+            const tempInput = document.getElementById('temperature-input');
+            if (tempInput) tempInput.value = temperature;
+            
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+
+            const userMessages = messagesContainer.querySelectorAll('.items-end .whitespace-pre-wrap');
+            if (userMessages.length > 0) {
+                const lastUserPrompt = userMessages[userMessages.length - 1].innerText;                
+                startChatStream(lastUserPrompt, true);
+            }
+        }
+    });
 </script>
 {% endblock %}
